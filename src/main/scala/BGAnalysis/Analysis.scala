@@ -13,5 +13,4 @@ object Analysis extends java.io.Serializable {
   spark.sparkContext.setLogLevel("WARN")
 
 
-
 }
