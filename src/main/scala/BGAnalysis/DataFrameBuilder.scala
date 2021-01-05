@@ -1,6 +1,6 @@
 package BGAnalysis
 
-import org.apache.spark.sql.{Row, SparkSession, functions}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession, functions}
 import org.apache.spark.sql.functions.udf
 
 object DataFrameBuilder  extends java.io.Serializable {
@@ -14,7 +14,7 @@ object DataFrameBuilder  extends java.io.Serializable {
 
 
 
-  def top100ToDF(): Unit ={
+  def top100ToDF(): DataFrame ={
     import spark.implicits._
     val idToMechanicUDF = udf((row: Row) => idToMechanic(row))
     spark.udf.register("idToMechanic",idToMechanicUDF)
@@ -23,14 +23,14 @@ object DataFrameBuilder  extends java.io.Serializable {
       .select($"col.name", $"col.rank",$"col.min_players", $"col.max_players",
         $"col.min_playtime", $"col.max_playtime", $"col.price", $"col.mechanics" )
       .withColumn("mechanics", functions.explode($"mechanics"))
-      .withColumn("mechanics", idToMechanicUDF($"mechanics")).show()
+      .withColumn("mechanics", idToMechanicUDF($"mechanics"))
   }
 
-  def gameMechanicsToDF(): Unit ={
+  def gameMechanicsToDF(): DataFrame ={
     import spark.implicits._
     val df = spark.read.option("multiline", true).json("game_mechanics").toDF()
     df.select(functions.explode($"mechanics"))
-      .select($"col.id", $"col.name").show(200)
+      .select($"col.id", $"col.name")
   }
 
   def idToMechanic(row: Row): String ={
