@@ -86,4 +86,22 @@ object Analysis extends java.io.Serializable {
     println(s"Rank and Playtime correlation: ${playtimeCorr}")
   }
 
+
+  /**
+   * Shows the popularity of multiplayer vs solo modes in board games
+   * @param top100 the top 100 board games DataFrame
+   */
+  def question3(top100: DataFrame): Unit ={
+    import spark.implicits._
+    val multiDF = top100.select($"name", $"rank", $"min_players", $"max_players").distinct().filter($"min_players" > 1 )
+    val soloDF = top100.select($"name", $"rank", $"min_players", $"max_players").distinct().filter($"min_players" === 1)
+
+    val multiCount = multiDF.count()
+    val soloCount = soloDF.count()
+
+    println(s"${multiCount} Multiplayer board games to ${soloCount} Solo/Offer Solo board games")
+  }
+
+
+
 }

@@ -13,6 +13,7 @@ object Main {
     //Questions
     Analysis.question1(top100)
     Analysis.question2(top100)
+    Analysis.question3(top100)
 
   }
 
