@@ -4,3 +4,4 @@ An analysis on board game data using Spark and Scala. This will be done to pract
 2) Does a board game price have a correlation with its potential rank? What about average playtime?
 3) According to the top 100, are multiplayer games more popular than solo only games/games that offer solo? 
 4) What is the most popular game mechanic? Which mechanic potentially leads to a higher board game rank?  
+5) Which year had the highest average rank of games published?
