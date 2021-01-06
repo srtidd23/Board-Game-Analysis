@@ -21,7 +21,7 @@ object DataFrameBuilder  extends java.io.Serializable {
     val df = spark.read.option("multiLine", true).json("top_100").toDF()
     df.select(functions.explode($"games"))
       .select($"col.name", $"col.rank",$"col.min_players", $"col.max_players",
-        $"col.min_playtime", $"col.max_playtime", $"col.price", $"col.mechanics" )
+        $"col.min_playtime", $"col.max_playtime", $"col.price", $"col.year_published",$"col.mechanics" )
       .withColumn("mechanics", functions.explode($"mechanics"))
       .withColumn("mechanics", idToMechanicUDF($"mechanics"))
   }

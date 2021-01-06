@@ -14,7 +14,9 @@ object Main {
     Analysis.question1(top100)
     Analysis.question2(top100)
     Analysis.question3(top100)
-
+    Analysis.question4A(top100)
+    Analysis.question4B(top100)
+    Analysis.question5(top100)
   }
 
 }

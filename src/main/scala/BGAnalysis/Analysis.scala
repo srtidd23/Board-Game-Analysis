@@ -1,7 +1,7 @@
 package BGAnalysis
 
 import org.apache.commons.math3.util.FastMath.sqrt
-import org.apache.spark.sql.functions.{collect_list, udf}
+import org.apache.spark.sql.functions.{asc, avg, collect_list, count, desc, udf}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession, functions}
 
 import scala.collection.mutable.ArrayBuffer
@@ -102,6 +102,43 @@ object Analysis extends java.io.Serializable {
     println(s"${multiCount} Multiplayer board games to ${soloCount} Solo/Offer Solo board games")
   }
 
+  /**
+   * Shows the top mechanics from board games in terms of popularity
+   * @param top100 the top 100 board games DataFrame
+   */
+  def question4A(top100: DataFrame): Unit ={
+    import spark.implicits._
+    val mechanicsDF = top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
+      .orderBy(desc("count")).show()
+  }
 
+  /**
+   * Shows the top mechanics that lead to better average board game ranks
+   * @param top100 the top 100 board games DataFrame
+   */
+  def question4B(top100: DataFrame): Unit ={
+    import spark.implicits._
+
+    top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
+      .orderBy(desc("count")).createOrReplaceTempView("mechanicsCount")
+    top100.groupBy($"mechanics").agg(avg($"rank") as "average_rank")
+      .orderBy(asc("average_rank")).filter($"mechanics" !== "UNKNOWN").createOrReplaceTempView("mechanicsScore")
+    val result = spark.sql("SELECT mechanicsScore.mechanics, mechanicsCount.count, mechanicsScore.average_rank" +
+      " FROM mechanicsScore JOIN mechanicsCount " +
+      "ON mechanicsScore.mechanics == mechanicsCount.mechanics " +
+      "WHERE mechanicsCount.count >= 3 " +
+      "ORDER BY mechanicsScore.average_rank ASC;").show()
+  }
+
+  def question5(top100: DataFrame): Unit ={
+    import spark.implicits._
+    val yearCountDF = top100.groupBy($"year_published").count().createOrReplaceTempView("yearCount")
+    val yearRankDF = top100.groupBy($"year_published").agg(avg($"rank") as "average_rank").orderBy(asc("average_rank")).createOrReplaceTempView("yearRank")
+    val result = spark.sql("SELECT yearRank.year_published, yearCount.count, yearRank.average_rank " +
+      "FROM yearRank JOIN yearCount " +
+      "ON yearRank.year_published == yearCount.year_published " +
+      "WHERE yearCount.count >= 3 " +
+      "ORDER BY yearRank.average_rank ASC;").show()
+  }
 
 }
