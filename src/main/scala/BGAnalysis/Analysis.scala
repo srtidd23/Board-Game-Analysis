@@ -14,6 +14,7 @@ object Analysis extends java.io.Serializable {
     .getOrCreate()
 
   spark.sparkContext.setLogLevel("WARN")
+  spark.conf.set("spark.sql.debug.maxToStringFields", 1000)
 
 
   /**
@@ -62,16 +63,16 @@ object Analysis extends java.io.Serializable {
   }
 
   /**
-   * Gives the correlation between a board game's rank and price as well as the correlation
-   * between rank and average playtime
+   * Gives the correlation between a board game's average user rating and price as well as the correlation
+   * between average user rating and average playtime
    * @param top100 the top 100 board games DataFrame
    */
   def question2(top100: DataFrame): Unit={
     import spark.implicits._
 
-    val distinct100DF = top100.select($"rank", $"price", ($"min_playtime"+$"max_playtime")/2 as "average_playtime" ).distinct()
+    val distinct100DF = top100.select($"average_user_rating", $"price", ($"min_playtime"+$"max_playtime")/2 as "average_playtime" ).distinct()
 
-    val rankArray = distinct100DF.select($"rank").collect().map(100.0 - _.get(0).toString.toDouble)
+    val rankArray = distinct100DF.select($"average_user_rating").collect().map( _.get(0).toString.toDouble)
     val priceArray = distinct100DF.select($"price").collect().map(_.get(0).toString.toDouble)
     val playtimeArray = distinct100DF.select($"average_playtime").collect().map(_.get(0).toString.toDouble)
 
@@ -130,9 +131,14 @@ object Analysis extends java.io.Serializable {
       "ORDER BY mechanicsScore.average_rank ASC;").show()
   }
 
+
+  /**
+   * Shows the top publishing years with the highest average ranking board games
+   * @param top100 the top 100 board games DataFrame
+   */
   def question5(top100: DataFrame): Unit ={
     import spark.implicits._
-    val yearCountDF = top100.groupBy($"year_published").count().createOrReplaceTempView("yearCount")
+    val yearCountDF = top100.select($"year_published", $"name").distinct().groupBy($"year_published").count().createOrReplaceTempView("yearCount")
     val yearRankDF = top100.groupBy($"year_published").agg(avg($"rank") as "average_rank").orderBy(asc("average_rank")).createOrReplaceTempView("yearRank")
     val result = spark.sql("SELECT yearRank.year_published, yearCount.count, yearRank.average_rank " +
       "FROM yearRank JOIN yearCount " +
