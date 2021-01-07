@@ -4,4 +4,4 @@ An analysis on board game data using Spark and Scala. This will be done to pract
 2) Does a board game average user rating have a correlation with its price? What about average playtime?
 3) According to the top 500, are multiplayer games more popular than solo only games/games that offer solo? 
 4) What is the most popular game mechanic to implement? Which mechanic potentially leads to a higher board game rating?  
-5) Which year had the highest average rating of games published?
+5) Which year published the highest average user rated board games?
