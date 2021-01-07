@@ -107,44 +107,50 @@ object Analysis extends java.io.Serializable {
    * Shows the top mechanics from board games in terms of popularity
    * @param top100 the top 100 board games DataFrame
    */
-  def question4A(top100: DataFrame): Unit ={
+  def question4A(top100: DataFrame, outputPath: String = "output/question4A"): Unit ={
     import spark.implicits._
     val mechanicsDF = top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
-      .orderBy(desc("count")).show()
+      .orderBy(desc("count"))
+    mechanicsDF.write.format("csv").save(outputPath)
+    mechanicsDF.show()
   }
 
   /**
-   * Shows the top mechanics that lead to better average board game ranks
+   * Shows the top mechanics that lead to better average board game ratings
    * @param top100 the top 100 board games DataFrame
    */
-  def question4B(top100: DataFrame): Unit ={
+  def question4B(top100: DataFrame, outputPath: String = "output/question4B"): Unit ={
     import spark.implicits._
 
     top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
       .orderBy(desc("count")).createOrReplaceTempView("mechanicsCount")
-    top100.groupBy($"mechanics").agg(avg($"rank") as "average_rank")
-      .orderBy(asc("average_rank")).filter($"mechanics" !== "UNKNOWN").createOrReplaceTempView("mechanicsScore")
-    val result = spark.sql("SELECT mechanicsScore.mechanics, mechanicsCount.count, mechanicsScore.average_rank" +
+    top100.groupBy($"mechanics").agg(avg($"average_user_rating") as "average_rating")
+      .orderBy(asc("average_rating")).filter($"mechanics" !== "UNKNOWN").createOrReplaceTempView("mechanicsScore")
+    val result = spark.sql("SELECT mechanicsScore.mechanics, mechanicsCount.count, mechanicsScore.average_rating" +
       " FROM mechanicsScore JOIN mechanicsCount " +
       "ON mechanicsScore.mechanics == mechanicsCount.mechanics " +
       "WHERE mechanicsCount.count >= 3 " +
-      "ORDER BY mechanicsScore.average_rank ASC;").show()
+      "ORDER BY mechanicsScore.average_rating DESC;")
+    result.write.format("csv").save(outputPath)
+    result.show()
   }
 
 
   /**
-   * Shows the top publishing years with the highest average ranking board games
+   * Shows the top publishing years with the highest average rated board games
    * @param top100 the top 100 board games DataFrame
    */
-  def question5(top100: DataFrame): Unit ={
+  def question5(top100: DataFrame, outputPath: String = "output/question5"): Unit ={
     import spark.implicits._
     val yearCountDF = top100.select($"year_published", $"name").distinct().groupBy($"year_published").count().createOrReplaceTempView("yearCount")
-    val yearRankDF = top100.groupBy($"year_published").agg(avg($"rank") as "average_rank").orderBy(asc("average_rank")).createOrReplaceTempView("yearRank")
-    val result = spark.sql("SELECT yearRank.year_published, yearCount.count, yearRank.average_rank " +
+    val yearRankDF = top100.groupBy($"year_published").agg(avg($"average_user_rating") as "average_rating").orderBy(asc("average_rating")).createOrReplaceTempView("yearRank")
+    val result = spark.sql("SELECT yearRank.year_published, yearCount.count, yearRank.average_rating " +
       "FROM yearRank JOIN yearCount " +
       "ON yearRank.year_published == yearCount.year_published " +
       "WHERE yearCount.count >= 3 " +
-      "ORDER BY yearRank.average_rank ASC;").show()
+      "ORDER BY yearRank.average_rating DESC;")
+    result.write.format("csv").save(outputPath)
+    result.show()
   }
 
 }
