@@ -14,7 +14,7 @@ object DataFrameBuilder  extends java.io.Serializable {
 
 
 
-  def top100ToDF(): DataFrame ={
+  def topBGToDF(): DataFrame ={
     import spark.implicits._
     val idToMechanicUDF = udf((row: Row) => idToMechanic(row))
     spark.udf.register("idToMechanic",idToMechanicUDF)

@@ -2,7 +2,7 @@ package BGAnalysis
 
 import org.apache.commons.math3.util.FastMath.sqrt
 import org.apache.spark.sql.functions.{asc, avg, collect_list, count, desc, udf}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession, functions}
+import org.apache.spark.sql.{DataFrame, Row, SaveMode, SparkSession, functions}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -83,8 +83,8 @@ object Analysis extends java.io.Serializable {
     val priceCorr = correlation(rankArrayNorm, priceArrayNorm)
     val playtimeCorr = correlation(rankArrayNorm, playtimeArrayNorm)
 
-    println(s"Rank and Price correlation: ${priceCorr}")
-    println(s"Rank and Playtime correlation: ${playtimeCorr}")
+    println(s"Rating and Price correlation: ${priceCorr}")
+    println(s"Rating and Playtime correlation: ${playtimeCorr}")
   }
 
 
@@ -111,7 +111,7 @@ object Analysis extends java.io.Serializable {
     import spark.implicits._
     val mechanicsDF = top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
       .orderBy(desc("count"))
-    mechanicsDF.write.format("csv").save(outputPath)
+    mechanicsDF.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
     mechanicsDF.show()
   }
 
@@ -131,7 +131,7 @@ object Analysis extends java.io.Serializable {
       "ON mechanicsScore.mechanics == mechanicsCount.mechanics " +
       "WHERE mechanicsCount.count >= 3 " +
       "ORDER BY mechanicsScore.average_rating DESC;")
-    result.write.format("csv").save(outputPath)
+    result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
     result.show()
   }
 
@@ -149,7 +149,7 @@ object Analysis extends java.io.Serializable {
       "ON yearRank.year_published == yearCount.year_published " +
       "WHERE yearCount.count >= 3 " +
       "ORDER BY yearRank.average_rating DESC;")
-    result.write.format("csv").save(outputPath)
+    result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
     result.show()
   }
 
