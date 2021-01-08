@@ -10,16 +10,16 @@ object Main {
       val filename = s"top_100/${i*100}_to_${(i+1)*100}"
       BoardGameAtlasClient.apiCallToFile(query,filename, false)
     }
-    val top500 = DataFrameBuilder.topBGToDF()
+    val top500 = DataFrameBuilder.topBGToDF(S3 = false)
 
 
     //Questions
     Analysis.question1(top500)
     Analysis.question2(top500)
     Analysis.question3(top500)
-    Analysis.question4A(top500)
-    Analysis.question4B(top500)
-    Analysis.question5(top500)
+    Analysis.question4A(top500, S3 = false)
+    Analysis.question4B(top500, S3 = false)
+    Analysis.question5(top500, S3 = false)
   }
 
 }

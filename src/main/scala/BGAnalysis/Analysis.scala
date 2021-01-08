@@ -12,9 +12,7 @@ object Analysis extends java.io.Serializable {
     .appName("Twitter Emoji Analysis")
     .master("local[4]")
     .getOrCreate()
-
   spark.sparkContext.setLogLevel("WARN")
-  spark.conf.set("spark.sql.debug.maxToStringFields", 1000)
 
 
   /**
@@ -107,11 +105,24 @@ object Analysis extends java.io.Serializable {
    * Shows the top mechanics from board games in terms of popularity
    * @param top100 the top 100 board games DataFrame
    */
-  def question4A(top100: DataFrame, outputPath: String = "output/question4A"): Unit ={
+  def question4A(top100: DataFrame, outputPath: String = "output/question4A", S3: Boolean = true): Unit ={
     import spark.implicits._
     val mechanicsDF = top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
       .orderBy(desc("count"))
-    mechanicsDF.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    if(S3){
+      // Replace Key with your AWS account key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
+      // Replace Key with your AWS secret key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
+      mechanicsDF.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question4A")
+    }
+    else{
+      mechanicsDF.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    }
     mechanicsDF.show()
   }
 
@@ -119,7 +130,7 @@ object Analysis extends java.io.Serializable {
    * Shows the top mechanics that lead to better average board game ratings
    * @param top100 the top 100 board games DataFrame
    */
-  def question4B(top100: DataFrame, outputPath: String = "output/question4B"): Unit ={
+  def question4B(top100: DataFrame, outputPath: String = "output/question4B", S3: Boolean = true): Unit ={
     import spark.implicits._
 
     top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
@@ -131,7 +142,20 @@ object Analysis extends java.io.Serializable {
       "ON mechanicsScore.mechanics == mechanicsCount.mechanics " +
       "WHERE mechanicsCount.count >= 3 " +
       "ORDER BY mechanicsScore.average_rating DESC;")
-    result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    if(S3){
+      // Replace Key with your AWS account key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
+      // Replace Key with your AWS secret key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
+      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question4B")
+    }
+    else{
+      result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    }
     result.show()
   }
 
@@ -140,7 +164,7 @@ object Analysis extends java.io.Serializable {
    * Shows the top publishing years with the highest average rated board games
    * @param top100 the top 100 board games DataFrame
    */
-  def question5(top100: DataFrame, outputPath: String = "output/question5"): Unit ={
+  def question5(top100: DataFrame, outputPath: String = "output/question5", S3: Boolean = true): Unit ={
     import spark.implicits._
     val yearCountDF = top100.select($"year_published", $"name").distinct().groupBy($"year_published").count().createOrReplaceTempView("yearCount")
     val yearRankDF = top100.groupBy($"year_published").agg(avg($"average_user_rating") as "average_rating").orderBy(asc("average_rating")).createOrReplaceTempView("yearRank")
@@ -149,7 +173,20 @@ object Analysis extends java.io.Serializable {
       "ON yearRank.year_published == yearCount.year_published " +
       "WHERE yearCount.count >= 3 " +
       "ORDER BY yearRank.average_rating DESC;")
-    result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    if(S3){
+      // Replace Key with your AWS account key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
+      // Replace Key with your AWS secret key (You can find this on IAM  service)
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
+      spark.sparkContext
+        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
+      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question5")
+    }
+    else{
+      result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
+    }
     result.show()
   }
 
