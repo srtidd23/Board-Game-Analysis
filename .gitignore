@@ -4,4 +4,4 @@
 target/
 output/*
 top_500/*
-.sh*
+spark-submit.sh
