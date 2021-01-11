@@ -3,4 +3,5 @@
 .idea/
 target/
 output/*
-top_100/*
+top_500/*
+.sh*
