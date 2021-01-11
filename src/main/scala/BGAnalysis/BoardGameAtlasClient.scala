@@ -42,30 +42,4 @@ object BoardGameAtlasClient {
     }
     fileWriter.close()
   }
-
-  def apiCallToS3(fieldQuery: String = "", foldername: String = "inputs", filename: String = "board_game_data",debug: Boolean): Unit ={
-    apiCallToFile(fieldQuery,filename,debug)
-
-    val BUCKET_NAME = "board-game-analysis"
-    val FILE_PATH = Paths.get(filename).toFile.getAbsolutePath
-    val FOLDER_NAME = foldername
-    val FILE_NAME = FOLDER_NAME+"/"+filename
-    val AWS_ACCESS_KEY = spark.conf.get("AWS_ACCESS_KEY")//System.getenv("AWS_ACCESS_KEY")
-    val AWS_SECRET_KEY = spark.conf.get("AWS_SECRET_KEY") //System.getenv("AWS_SECRET_KEY")
-
-    try {
-      val awsCredentials = new BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY)
-      val amazonS3Client = new AmazonS3Client(awsCredentials)
-
-      // upload file
-      val file = new File(FILE_PATH)
-      amazonS3Client.putObject(BUCKET_NAME, FILE_NAME, file)
-      file.delete()
-
-
-    } catch {
-      case ase: AmazonServiceException => System.err.println("Exception: " + ase.toString)
-      case ace: AmazonClientException => System.err.println("Exception: " + ace.toString)
-    }
-  }
 }

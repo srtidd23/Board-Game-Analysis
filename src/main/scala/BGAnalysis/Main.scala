@@ -13,15 +13,14 @@ object Main {
     }
     val top500 = DataFrameBuilder.topBGToDF(S3 = false)
     top500.show()
-//
-//
-//    //Questions
-//    Analysis.question1(top500)
-//    Analysis.question2(top500)
-//    Analysis.question3(top500)
-//    Analysis.question4A(top500, S3 = false)
-//    Analysis.question4B(top500, S3 = false)
-//    Analysis.question5(top500, S3 = false)
+
+//  Questions
+    Analysis.question1(top500)
+    Analysis.question2(top500)
+    Analysis.question3(top500)
+    Analysis.question4A(top500, S3 = false)
+    Analysis.question4B(top500, S3 = false)
+    Analysis.question5(top500, S3 = false)
   }
 
 }
