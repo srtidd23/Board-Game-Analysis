@@ -7,8 +7,7 @@ import org.apache.spark.sql.functions.udf
 object DataFrameBuilder  extends java.io.Serializable {
 
   val spark = SparkSession.builder()
-    .appName("Twitter Emoji Analysis")
-    .master("local[4]")
+    .appName("DataFrameBuilder")
     .getOrCreate()
 
   spark.sparkContext.setLogLevel("WARN")

@@ -29,8 +29,8 @@ object BoardGameAtlasClient {
 
     val reader = new BufferedReader(new InputStreamReader(entity.getContent))
     var line = reader.readLine
-
-    val fileWriter = new PrintWriter(Paths.get(filename).toFile)
+    val file = new File(filename)
+    val fileWriter = new PrintWriter(file)
     var lineNumber = 1 //track line number to know when to move to new file
     while (line != null) {
       fileWriter.println(line)
