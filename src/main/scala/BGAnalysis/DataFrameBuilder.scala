@@ -15,7 +15,7 @@ object DataFrameBuilder  extends java.io.Serializable {
 
 
 
-  def topBGToDF(S3:Boolean = true, s3Folder: String = "inputs"): DataFrame ={
+  def topBGToDF(S3:Boolean = true, s3Folder: String = "inputs/"): DataFrame ={
     import spark.implicits._
     val idToMechanicUDF = udf((row: Row) => idToMechanic(row))
     spark.udf.register("idToMechanic",idToMechanicUDF)
@@ -23,16 +23,16 @@ object DataFrameBuilder  extends java.io.Serializable {
     if(S3){
       // Replace Key with your AWS account key (You can find this on IAM  service)
       spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
+        .hadoopConfiguration.set("fs.s3.access.key", spark.conf.get("AWS_ACCESS_KEY"))//System.getenv("AWS_ACCESS_KEY"))
       // Replace Key with your AWS secret key (You can find this on IAM  service)
       spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
+        .hadoopConfiguration.set("fs.s3.secret.key", spark.conf.get("AWS_SECRET_KEY"))//System.getenv("AWS_SECRET_KEY"))
       spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-       df = spark.read.option("multiLine", true).json("s3a://board_game_analysis/"+s3Folder).toDF()
+        .hadoopConfiguration.set("fs.s3.endpoint", "s3.amazonaws.com")
+       df = spark.read.option("multiLine", true).json("s3://board-game-analysis/"+s3Folder).toDF()
     }
     else {
-       df = spark.read.option("multiLine", true).json("top_100").toDF()
+       df = spark.read.option("multiLine", true).json("top_500").toDF()
     }
     df.select(functions.explode($"games"))
       .select($"col.name", $"col.rank",$"col.min_players", $"col.max_players",

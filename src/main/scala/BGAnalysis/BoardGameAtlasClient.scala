@@ -2,7 +2,6 @@ package BGAnalysis
 
 import java.io.{BufferedReader, File, InputStreamReader, PrintWriter}
 import java.nio.file.{Files, Paths}
-
 import org.apache.http.client.config.{CookieSpecs, RequestConfig}
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.utils.URIBuilder
@@ -11,10 +10,15 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.AmazonClientException
 import com.amazonaws.AmazonServiceException
+import org.apache.spark.sql.SparkSession
+
 import java.io.File
 
 
 object BoardGameAtlasClient {
+  val spark = SparkSession.builder()
+    .appName("BGClient")
+    .getOrCreate()
 
   def apiCallToFile(fieldQuery: String = "", filename: String = "board_game_data",debug: Boolean): Unit = {
     val httpClient = HttpClients.custom.setDefaultRequestConfig(RequestConfig.custom.setCookieSpec(CookieSpecs.STANDARD).build).build
@@ -42,12 +46,12 @@ object BoardGameAtlasClient {
   def apiCallToS3(fieldQuery: String = "", foldername: String = "inputs", filename: String = "board_game_data",debug: Boolean): Unit ={
     apiCallToFile(fieldQuery,filename,debug)
 
-    val BUCKET_NAME = "board_game_analysis"
+    val BUCKET_NAME = "board-game-analysis"
     val FILE_PATH = Paths.get(filename).toFile.getAbsolutePath
     val FOLDER_NAME = foldername
     val FILE_NAME = FOLDER_NAME+"/"+filename
-    val AWS_ACCESS_KEY = System.getenv("AWS_ACCESS_KEY")
-    val AWS_SECRET_KEY = System.getenv("AWS_SECRET_KEY")
+    val AWS_ACCESS_KEY = spark.conf.get("AWS_ACCESS_KEY")//System.getenv("AWS_ACCESS_KEY")
+    val AWS_SECRET_KEY = spark.conf.get("AWS_SECRET_KEY") //System.getenv("AWS_SECRET_KEY")
 
     try {
       val awsCredentials = new BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY)
@@ -56,6 +60,7 @@ object BoardGameAtlasClient {
       // upload file
       val file = new File(FILE_PATH)
       amazonS3Client.putObject(BUCKET_NAME, FILE_NAME, file)
+      file.delete()
 
 
     } catch {

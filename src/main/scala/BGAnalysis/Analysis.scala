@@ -118,7 +118,7 @@ object Analysis extends java.io.Serializable {
         .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
       spark.sparkContext
         .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      mechanicsDF.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question4A")
+      mechanicsDF.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question4A")
     }
     else{
       mechanicsDF.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
@@ -151,7 +151,7 @@ object Analysis extends java.io.Serializable {
         .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
       spark.sparkContext
         .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question4B")
+      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question4B")
     }
     else{
       result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
@@ -182,7 +182,7 @@ object Analysis extends java.io.Serializable {
         .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
       spark.sparkContext
         .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board_game_analytics/output/question5")
+      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question5")
     }
     else{
       result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)

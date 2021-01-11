@@ -4,3 +4,4 @@
 target/
 output/*
 top_100/*
+*.sh
