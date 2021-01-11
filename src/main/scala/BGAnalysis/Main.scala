@@ -1,6 +1,7 @@
 package BGAnalysis
 
 object Main {
+  println(this.getClass.getName)
 
   def main(args: Array[String]): Unit = {
 
