@@ -9,7 +9,6 @@ object Main {
       val query = s"search?order_by=rank&ascending=false&client_id=JLBr5npPhV&skip=${i*100}"
       val filename = s"top_500/${i*100}_to_${(i+1)*100}"
       BoardGameAtlasClient.apiCallToFile(query,filename, false)
-      //BoardGameAtlasClient.apiCallToS3(query,"inputs","top_500", false)
     }
     val top500 = DataFrameBuilder.topBGToDF(S3 = false)
     top500.show()

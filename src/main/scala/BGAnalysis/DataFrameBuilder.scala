@@ -20,20 +20,7 @@ object DataFrameBuilder  extends java.io.Serializable {
     val idToMechanicUDF = udf((row: Row) => idToMechanic(row))
     spark.udf.register("idToMechanic",idToMechanicUDF)
     var df: DataFrame = spark.emptyDataFrame
-    if(S3){
-      // Replace Key with your AWS account key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3.access.key", spark.conf.get("AWS_ACCESS_KEY"))//System.getenv("AWS_ACCESS_KEY"))
-      // Replace Key with your AWS secret key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3.secret.key", spark.conf.get("AWS_SECRET_KEY"))//System.getenv("AWS_SECRET_KEY"))
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3.endpoint", "s3.amazonaws.com")
-       df = spark.read.option("multiLine", true).json("s3://board-game-analysis/"+s3Folder).toDF()
-    }
-    else {
        df = spark.read.option("multiLine", true).json("top_500").toDF()
-    }
     df.select(functions.explode($"games"))
       .select($"col.name", $"col.rank",$"col.min_players", $"col.max_players",
         $"col.min_playtime", $"col.max_playtime", $"col.price", $"col.year_published", $"col.average_user_rating",$"col.mechanics" )

@@ -109,20 +109,9 @@ object Analysis extends java.io.Serializable {
     import spark.implicits._
     val mechanicsDF = top100.groupBy($"mechanics").agg(count($"mechanics") as "count")
       .orderBy(desc("count"))
-    if(S3){
-      // Replace Key with your AWS account key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
-      // Replace Key with your AWS secret key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      mechanicsDF.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question4A")
-    }
-    else{
+
       mechanicsDF.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
-    }
+
     mechanicsDF.show()
   }
 
@@ -142,20 +131,10 @@ object Analysis extends java.io.Serializable {
       "ON mechanicsScore.mechanics == mechanicsCount.mechanics " +
       "WHERE mechanicsCount.count >= 3 " +
       "ORDER BY mechanicsScore.average_rating DESC;")
-    if(S3){
-      // Replace Key with your AWS account key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
-      // Replace Key with your AWS secret key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question4B")
-    }
-    else{
+
+
       result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
-    }
+
     result.show()
   }
 
@@ -173,20 +152,9 @@ object Analysis extends java.io.Serializable {
       "ON yearRank.year_published == yearCount.year_published " +
       "WHERE yearCount.count >= 3 " +
       "ORDER BY yearRank.average_rating DESC;")
-    if(S3){
-      // Replace Key with your AWS account key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.access.key", System.getenv("AWS_ACCESS_KEY"))
-      // Replace Key with your AWS secret key (You can find this on IAM  service)
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.secret.key", System.getenv("AWS_SECRET_KEY"))
-      spark.sparkContext
-        .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
-      result.write.mode(SaveMode.Overwrite).option("header", true).csv("s3a://board-game-analysis/output/question5")
-    }
-    else{
+
       result.write.mode(SaveMode.Overwrite).format("csv").save(outputPath)
-    }
+
     result.show()
   }
 
