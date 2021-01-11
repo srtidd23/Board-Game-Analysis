@@ -1,1 +1,1 @@
-spark-submit --master local --class BGAnalysis.Main target/scala-2.12/BoardGameAnalysis-assembly-0.1.jar \
+spark-submit --master local --class BGAnalysis.Main --conf AWS_ACCESS_KEY="AKIAVKKVJCTAQDGPW3GH" --conf AWS_SECRET_KEY="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" target/scala-2.12/BoardGameAnalysis-assembly-0.1.jar \
